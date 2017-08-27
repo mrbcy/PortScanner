@@ -28,8 +28,9 @@ public class PortScanner implements Runnable{
 	private boolean isWorking = false;
 	private ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private int timeoutMillSeconds;
-	
-	
+	Timer notificationTimer = new Timer();
+
+
 	public void addTaskBatch(String startIP, String endIP, int port){
 		taskIterator.addTaskBatch(startIP, endIP, port);
 	}
@@ -47,13 +48,17 @@ public class PortScanner implements Runnable{
 		scanThreadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadNum);
 		
 		// 创建定时通知任务
-		Timer timer = new Timer();     
-        timer.schedule(new NotifyTimeTask(this), 5000, 4500);
+
+		notificationTimer.schedule(new NotifyTimeTask(this), 5000, 4500);
 		new Thread(this).start();
 	}
 	
 	public void stopScan() {
+		if(scanThreadPool.isShutdown()){
+			return;
+		}
 		System.out.println("扫描即将结束，等待所有已提交任务完成...");
+		notificationTimer.cancel();
 		scanThreadPool.shutdown();
 		try {
 			scanThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
