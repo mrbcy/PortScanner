@@ -16,6 +16,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import cn.mrbcy.PortScanner.entity.Task;
 import cn.mrbcy.PortScanner.listener.ScanProgressListener;
 import cn.mrbcy.PortScanner.util.TaskIterator;
+import org.apache.log4j.Logger;
 
 public class PortScanner implements Runnable{
 	private ThreadPoolExecutor scanThreadPool; 
@@ -29,6 +30,8 @@ public class PortScanner implements Runnable{
 	private ReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private int timeoutMillSeconds;
 	Timer notificationTimer = new Timer();
+
+	private Logger logger = Logger.getLogger(PortScanner.class);
 
 
 	public void addTaskBatch(String startIP, String endIP, int port){
@@ -57,7 +60,7 @@ public class PortScanner implements Runnable{
 		if(scanThreadPool.isShutdown()){
 			return;
 		}
-		System.out.println("扫描即将结束，等待所有已提交任务完成...");
+		logger.info("扫描即将结束，等待所有已提交任务完成...");
 		notificationTimer.cancel();
 		scanThreadPool.shutdown();
 		try {
@@ -87,7 +90,7 @@ public class PortScanner implements Runnable{
 				
 			}
 			if(scanThreadPool.isTerminating()){
-				System.out.println("终止新任务添加，等待所有任务完成后结束扫描...");
+                logger.info("终止新任务添加，等待所有任务完成后结束扫描...");
 				break;
 			}
 			try {

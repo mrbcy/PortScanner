@@ -21,11 +21,11 @@ public class Connector {
 			if(endTime - startTime <= timeoutMillSeconds)
 			{
 				String log = String.format("OPEN %s:%d is open, scan costs %d ms", host,port,endTime - startTime);
-				logger.info(log);
+//				logger.info(log);
 				return true;
 			}else{
 				String log = String.format("TIMEOUT %s:%d is open, scan costs %d ms", host,port,endTime - startTime);
-				logger.warn(log);
+//				logger.warn(log);
 				return false;
 			}
 		} catch (Exception e) {
